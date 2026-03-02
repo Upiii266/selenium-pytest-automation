@@ -11,15 +11,30 @@ def pytest_runtest_makereport(item, call):
     rep = outcome.get_result()
     setattr(item, f"rep_{rep.when}", rep)
 
-@pytest.fixture
+@pytest.fixture 
 def driver(request):
+    """Fixture utama untuk semua scenario default"""
     driver = webdriver.Chrome()
     driver.maximize_window()
     yield driver
+    _take_screenshot_if_failed(driver,request)
+    driver.quit()
 
+@pytest.fixture
+def driver_for_remove(request):
+    """Fixture khusus untuk scenario remove item"""
+    driver = webdriver.Chrome()
+    driver.maximize_window()
+    driver.get("https://www.saucedemo.com/cart")
+    yield driver
+    _take_screenshot_if_failed(driver,request)
+    driver.quit()
+
+def _take_screenshot_if_failed(driver, request):
+    """Function take screenshoot ketika negatif case & test failed"""
     rep_call = getattr(request.node, "rep_call", None)
     rep_setup = getattr(request.node, "rep_setup", None)
-    rep_teardown = getattr(request.node,"re_teardown",None)
+    rep_teardown = getattr(request.node,"rep_teardown",None)
 
     if any ([rep_call and rep_call.failed, rep_setup and rep_setup.failed, rep_teardown and rep_teardown.failed]):
         screenshots_dir = os.path.join(BASE_DIR, "screenshots")
@@ -35,4 +50,3 @@ def driver(request):
         except Exception as e:
             print(f"⚠️ Failed to take screenshot: {e}")
 
-    driver.quit()

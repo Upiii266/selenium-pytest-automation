@@ -24,6 +24,9 @@ def test_04_e2e_checkout_flow_negative (driver, firstname, lastname, postalcode,
      checkout_page = CheckoutPage(driver)
      checkout_page.click_checkout()
      checkout_page.fill_checkout_info(firstname,lastname,postalcode)
+     
+     #assert overview page (still on checkout page)
+     assert "checkout-step-one.html" in checkout_page.driver.current_url
 
      error_message = checkout_page.get_error_message()    
      assert expected_error in error_message

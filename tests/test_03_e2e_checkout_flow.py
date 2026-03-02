@@ -13,10 +13,15 @@ def test_03_e2e_checkout_flow (driver) :
     login_page.login("standard_user","secret_sauce")
 
     product_page.add_first_product_to_cart()
-    product_page.go_to_cart()
+    print("Cart count:",product_page.get_cart_count())
+    assert product_page.get_cart_count()> 0, "Cart kosong, checkout bakal gagal"
+
+    product_page.go_to_cart()    
 
     checkout_page.click_checkout()
     checkout_page.fill_checkout_info("John", "Doe", "12345")
+    checkout_page.wait_for_overview_page()
     checkout_page.finish_checkout()
 
+    
     assert checkout_page.get_success_message() == "Thank you for your order!"
